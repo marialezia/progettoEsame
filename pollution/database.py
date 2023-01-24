@@ -25,7 +25,10 @@ def groupSc(df, sc):
     return groups.get_group(sc)
 
 
-
+def groupSn(df, sn):
+    #mi resituisce una tabella corrispondente alla stazione di monitoraggio sn
+    groups = df.groupby(['siteNum'])
+    return groups.get_group(sn)
 
 def dropColumns(df):
     df = df.drop(columns=['NO2 1st Max Value', 'NO2 1st Max Hour', 'NO2 AQI', 'O3 1st Max Value', 'O3 1st Max Hour', 'O3 AQI', 'SO2 1st Max Value', 'SO2 1st Max Hour', 'SO2 AQI', 'CO 1st Max Value', 'CO 1st Max Hour', 'CO AQI', 'Unnamed: 29'])

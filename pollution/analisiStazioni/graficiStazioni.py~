@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-import classi as cl
+import classiStazioni as clSz
 import sys, os
 from tqdm import tqdm
 import matplotlib.pyplot as plt
@@ -20,17 +20,6 @@ def plotInquinanti(stato, indice, title):
 def plot(stato):
     for i in range(len(stato.siteNum)):
         plotInquinanti(stato, i, 'Stazione di monitoraggio numero ' + str(stato.siteNum[i]))
-
-def plotInquinanti2(stato):
-    plt.plot(stato.date, stato.no2,label= 'NO2')
-    plt.plot(stato.date, stato.o3, label = 'O3')
-    plt.plot(stato.date, stato.so2, label = 'SO2')
-    plt.plot(stato.date, stato.co,  label = 'CO')
-    plt.grid()
-    plt.xlabel('Time')
-    plt.ylabel('concentrazione')
-    plt.legend()
-    plt.show()
 
         
 def subplotInquinanti(stato, indice, title):
@@ -102,17 +91,3 @@ def subplotsFft(stato):
     for i in range(len(stato.siteNumFft)):
         subplotInquinantiFft(stato, i, 'Stazione di monitoraggio numero ' + str(stato.siteNumFft[i]))
 
-def plotFft2(stato):
-    lNo2 = len(stato.no2F)//2
-    lO3 = len(stato.o3F)//2
-    lSo2 = len(stato.so2F)//2
-    lCo = len(stato.coF)//2
-
-    plt.plot(stato.no2F[lNo2+1:], stato.no2P[lNo2+1:], label = 'NO2')
-    plt.plot(stato.o3F[lO3+1:], stato.o3P[lO3+1:], label = 'O3')
-    plt.plot(stato.so2F[lSo2+1:], stato.so2P[lSo2+1:], label = 'SO2')
-    plt.plot(stato.coF[lCo+1:], stato.coP[lCo+1:], label = 'CO')
-    plt.grid()
-    plt.xlabel('frequenza')
-    plt.legend()
-    plt.show()
