@@ -32,17 +32,33 @@ def plotFft2(stato, title):
     
     plt.figure(figsize = (12,12))
     plt.title(title)
-    plt.plot(stato.no2F[lNo2+1:], stato.no2P[lNo2+1:], label = 'NO2')
-    plt.plot(stato.o3F[lO3+1:], stato.o3P[lO3+1:], label = 'O3')
-    plt.plot(stato.so2F[lSo2+1:], stato.so2P[lSo2+1:], label = 'SO2')
-    plt.plot(stato.coF[lCo+1:], stato.coP[lCo+1:], label = 'CO')
+    plt.plot(stato.no2F[lNo2+1:], stato.no2P[lNo2+1:],'o', label = 'NO2')
+    plt.plot(stato.o3F[lO3+1:], stato.o3P[lO3+1:],'o', label = 'O3')
+    plt.plot(stato.so2F[lSo2+1:], stato.so2P[lSo2+1:],'o', label = 'SO2')
+    plt.plot(stato.coF[lCo+1:], stato.coP[lCo+1:], 'o',label = 'CO')
     plt.grid()
     plt.xlabel('frequenza')
     plt.ylabel('Spettro di potenza')
     plt.legend()
     plt.show()
 
-
+def plotFftPeriodo2(stato, title):
+    lNo2 = len(stato.no2F)//2
+    lO3 = len(stato.o3F)//2
+    lSo2 = len(stato.so2F)//2
+    lCo = len(stato.coF)//2
+    
+    plt.figure(figsize = (12,12))
+    plt.title(title)
+    plt.plot(1/(stato.no2F[lNo2+1:]), stato.no2P[lNo2+1:],'o', label = 'NO2')
+    plt.plot(1/(stato.o3F[lO3+1:]), stato.o3P[lO3+1:],'o', label = 'O3')
+    plt.plot(1/(stato.so2F[lSo2+1:]), stato.so2P[lSo2+1:],'o', label = 'SO2')
+    plt.plot(1/(stato.coF[lCo+1:]), stato.coP[lCo+1:], 'o',label = 'CO')
+    plt.grid()
+    plt.xlabel('periodo')
+    plt.ylabel('Spettro di potenza')
+    plt.legend()
+    plt.show()
             
 def originaleVsFiltrato(stato, statoFiltrato, title):
     '''subplot di quattro grafici della concentrazione in funzione del tempo, in ogni grafico è riportato il dato originale e quello filtrato, i quattro grafici corrispondono a un tipo di inquinante diverso'''

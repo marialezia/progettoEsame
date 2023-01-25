@@ -19,6 +19,7 @@ sintesi: risintetizza le trasformate
 
     def __init__(self):
         self.date = np.empty(0)
+        self.days = np.empty(0)
         self.no2 = np.empty(0)
         self.o3 = np.empty(0)
         self.so2 = np.empty(0)
@@ -26,6 +27,7 @@ sintesi: risintetizza le trasformate
         
     def aggiornaStato(self, date, no2, o3, so2, co):
         self.date = date
+        self.days = np.arange(0, len(self.date)+1)
         self.no2 = no2
         self.o3 = o3
         self.so2 = so2
@@ -49,6 +51,7 @@ mascheraStato: filtra coefficienti mettendoli a zero a secondo le maschere inser
 
     def __init__(self, stato):
         self.date = stato.date
+        self.days = stato.days
         self.no2Fft = fft.rfft(stato.no2)
         self.o3Fft = fft.rfft(stato.o3)
         self.so2Fft = fft.rfft(stato.so2)

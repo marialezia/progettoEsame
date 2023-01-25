@@ -12,10 +12,11 @@ import grafici as gr
 
 def analisiStato(stato, statoFft, nome):
     #Faccio il grafico della concentrazione degli inquinanti in funzione del tempo e dello spettro di potenza in funzione delle frequenze
-
+    '''
     gr.plotInquinanti2(stato, 'Analisi ' + nome + ': grafico concentrazione inquinanti in funzione del tempo')
     gr.plotFft2(statoFft, 'Analisi ' + nome + ': grafico spettro di potenza inquinanti in funzione delle frequenze')
-
+    gr.plotFftPeriodo2(statoFft, 'Analisi ' + nome + ': grafico spettro di potenza inquinanti in funzione delle frequenze')
+    '''
     #faccio dei filtri che eliminano i coefficienti con frequenze maggiori delle quattro che ho selezionato 
     filtri = ([0.1,0.05,0.03,0.01])
     statoFftFiltrato1 = fz.maskStato(stato, filtri[0], filtri[0], filtri[0], filtri[0])
@@ -24,10 +25,10 @@ def analisiStato(stato, statoFft, nome):
     statoFftFiltrato4 = fz.maskStato(stato, filtri[3], filtri[3], filtri[3], filtri[3])
 
     #risintetizzo il segnale filtrato
-    statoFiltrato1 = fz.sintesiFiltrato(statoFftFiltrato1)
-    statoFiltrato2 = fz.sintesiFiltrato(statoFftFiltrato2)
-    statoFiltrato3 = fz.sintesiFiltrato(statoFftFiltrato3)
-    statoFiltrato4 = fz.sintesiFiltrato(statoFftFiltrato4)
+    statoFiltrato1 = fz.sintesiFiltrato2(statoFftFiltrato1)
+    statoFiltrato2 = fz.sintesiFiltrato2(statoFftFiltrato2)
+    statoFiltrato3 = fz.sintesiFiltrato2(statoFftFiltrato3)
+    statoFiltrato4 = fz.sintesiFiltrato2(statoFftFiltrato4)
 
     #grafici confronto inquinanti originali e risintetizzati  
     #gr.plotInquinanti2(statoFiltrato1, 'Analisi ' + nome + ': dati risintetizzati con filtro frequenze f < ' +str(filtri[0]))
@@ -36,7 +37,7 @@ def analisiStato(stato, statoFft, nome):
     #gr.plotInquinanti2(statoFiltrato4, 'Analisi ' + nome + ': dati risintetizzati con filtro frequenze f < ' +str(filtri[3]))
 
     '''subplot di quattro grafici della concentrazione in funzione del tempo, in ogni grafico è riportato il dato originale e quello filtratii quattro grafici corrispondono a un tipo di inquinante diverso'''
-    gr.originaleVsFiltrato(stato, statoFiltrato1, 'Analisi ' + nome + ':confronto inquinanti dati originali e filtrati con frequenza f<0.1')
+    #gr.originaleVsFiltrato(stato, statoFiltrato1, 'Analisi ' + nome + ':confronto inquinanti dati originali e filtrati con frequenza f<0.1')
     #gr.originaleVsFiltrato(stato, statoFiltrato2, 'Analisi ' + nome + ': confronto inquinanti dati originali e filtrati con frequenza f<0.05')
     #gr.originaleVsFiltrato(stato, statoFiltrato3, 'Analisi ' + nome + ': confronto inquinanti dati originali e filtrati con frequenza f<0.03')
     #gr.originaleVsFiltrato(stato, statoFiltrato4, 'Analisi ' + nome + ': confronto inquinanti dati originali e filtrati con frequenza f<0.01')
@@ -44,6 +45,18 @@ def analisiStato(stato, statoFft, nome):
     
     #gr.subplotfiltri(stato, statoFiltrato1, statoFiltrato2, statoFiltrato3, statoFiltrato4, filtri)
     #gr.plotInquinanti2(statoFiltrato4, '')
+
+    #calcolo differenza originale e filtrato
+    diff1 = fz.differenza(stato, statoFiltrato1)
+    diff2 = fz.differenza(stato, statoFiltrato2)
+    diff3 = fz.differenza(stato, statoFiltrato3)
+    diff4 = fz.differenza(stato, statoFiltrato4)
+
+    gr.plotInquinanti2(diff1, 'Analisi ' + nome + ': differenza originale e filtrato con f < ' + str(filtri[0]))
+    gr.plotInquinanti2(diff2, 'Analisi ' + nome + ': differenza originale e filtrato con f < ' + str(filtri[1]))
+    gr.plotInquinanti2(diff3, 'Analisi ' + nome + ': differenza originale e filtrato con f < ' + str(filtri[2]))
+    gr.plotInquinanti2(diff4, 'Analisi ' + nome + ': differenza originale e filtrato con f < ' + str(filtri[3]))
+    
     return 'Analisi completata \n'
 
 

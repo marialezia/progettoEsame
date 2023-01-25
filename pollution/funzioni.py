@@ -82,11 +82,19 @@ def maskStato(stato, sogliaNo2, sogliaO3, sogliaSo2, sogliaCo):
     statoCopia.mascheraStato(mascheraNo2, mascheraO3, mascheraSo2, mascheraCo)
     return statoCopia
 
-def sintesiFiltrato(statoFiltratoFft):
+def sintesiFiltrato2(statoFiltratoFft):
     stato = cl.Stato2()
     stato.sintesi(statoFiltratoFft)
     return stato
 
+def differenza(stato, statoFiltrato):
+    diff = cl.Stato2()
+    diff.date = stato.date
+    diff.no2 = stato.no2 - statoFiltrato.no2
+    diff.o3 = stato.o3 - statoFiltrato.o3
+    diff.so2 = stato.so2 - statoFiltrato.so2
+    diff.co = stato.co - statoFiltrato.co
+    return diff
 
 #---------------------------------------------------------------#
 #          Definizioni moduli per Analisi Stazioni              #
