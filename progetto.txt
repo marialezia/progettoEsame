@@ -1,0 +1,46 @@
+ndicazioni aggiuntive sui dati:
+Per ogni stato i dati riportano dati relativi a diverse stazioni di monitoraggio
+Per ogni stazione di monitoraggio sono riportate più righe per la setssa data con valori simili
+Per l'analisi richiesta di seguito limitare lo studio alla concentrazione media
+Selezionare 5 stati rappresentativi di zone diverse del paese su cui effettuare lo studio.Il sottocampione corrisponde ai dati relativi al periodo
+
+RICHIESTE
+1)Rielaborare i dati in modo tale che ogni stazione di monitoraggio, compaia al massimo una volta pergiorno.
+2)Studuare andamento temporale, spettro di Fourier, eventuali periodicità, correlazioni e anticorrelazioniper:
+- i diversi inquinanti;
+- le diverse stazioni all'interno di uno stato;
+- i diversi stati;
+3)Applicare un filtro in frequenza ai dati in modo da visualizzare solo il comportamento di lungo periodo
+4)riportare eventuali risultati interesanti sui dati filtrati o sulle frequenze di filtro
+5)Analizzare andamento e caratteristiche di rumore della differenza fra i dati e le serie temporali filtrate
+6)Se possibile evidenziare eventuali risultati interessanti
+7)Utilizzare una o più mappe geografiche per mostrare alcuni dei risultati
+
+COSE DA FARE
+1 - file python per rielaborare i dati e creare file più accessibiòi
+California (6)
+Country Of Mexico (80)
+Kansas (20)
+New York (36)
+Illinois (17)
+
+2-scrivere una funzione che per le date uguali fa una media dei valori associa come errore la deviazione standard
+potrei creare una classe dato che contiente i dati sulle colonne: 
+class Dato 
+--> data
+--> country code
+--> site num
+--> SO2 + err
+--> No2 + err
+--> CO + err
+--> O3 + err
+
+Class Stato 
+--> array di Dati
+--> numero di dati 
+--> altri parametri da vedere 
+
+3 - 
+
+
+
