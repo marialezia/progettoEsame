@@ -27,7 +27,7 @@ sintesi: risintetizza le trasformate
         
     def aggiornaStato(self, date, no2, o3, so2, co):
         self.date = date
-        self.days = np.arange(0, len(self.date)+1)
+        self.days = np.arange(0, len(self.date))
         self.no2 = no2
         self.o3 = o3
         self.so2 = so2
@@ -35,6 +35,7 @@ sintesi: risintetizza le trasformate
 
     def sintesi(self, statoFft):
         self.date = statoFft.date
+        self.days = statoFft.days
         self.no2 =  fft.irfft(statoFft.no2Fft, len(self.date))
         self.o3 =  fft.irfft(statoFft.o3Fft, len(self.date))
         self.so2 =  fft.irfft(statoFft.so2Fft, len(self.date))

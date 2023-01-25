@@ -90,11 +90,18 @@ def sintesiFiltrato2(statoFiltratoFft):
 def differenza(stato, statoFiltrato):
     diff = cl.Stato2()
     diff.date = stato.date
+    diff.days = stato.days
     diff.no2 = stato.no2 - statoFiltrato.no2
     diff.o3 = stato.o3 - statoFiltrato.o3
     diff.so2 = stato.so2 - statoFiltrato.so2
     diff.co = stato.co - statoFiltrato.co
     return diff
+
+def massimo(statoFft):
+    maxx = ([np.argmax(statoFft.no2P[1:]), np.argmax(statoFft.o3P[1:]), np.argmax(statoFft.so2P[1:]), np.argmax(statoFft.coP[1:])])
+    fmax = ([statoFft.no2F[maxx[0]], statoFft.o3F[maxx[1]], statoFft.so2F[maxx[2]], statoFft.coF[maxx[3]]])
+    pmax = ([1/fmax[0], 1/fmax[1], 1/fmax[2], 1/fmax[3]])    
+    return maxx, fmax, pmax
 
 #---------------------------------------------------------------#
 #          Definizioni moduli per Analisi Stazioni              #
