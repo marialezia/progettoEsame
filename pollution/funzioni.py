@@ -103,6 +103,14 @@ def massimo(statoFft):
     pmax = ([1/fmax[0], 1/fmax[1], 1/fmax[2], 1/fmax[3]])    
     return maxx, fmax, pmax
 
+def printMax(fmax, pmax, name):
+    print('Valori corripondenti allo stato' + name + '\n')
+    print('-------------------------------------------------------------')
+    print('|           |    NO2    |    O3     |    SO2    |    CO     |')
+    print('| freq max  |  '+str(round(fmax[0], 5))+'  |  '+str(round(fmax[1], 5))+'  |  '+ str(round(fmax[2], 5))+'  |  '+str(round(fmax[3], 5))+'  |')
+    print('| per  max  |  '+str(round(pmax[0], 5))+'  |  '+str(round(pmax[1], 5))+'  |  '+ str(round(pmax[2], 5))+'  |  '+str(round(pmax[3], 5))+'  |')
+    print('-------------------------------------------------------------')
+
 #---------------------------------------------------------------#
 #          Definizioni moduli per Analisi Stazioni              #
 #---------------------------------------------------------------#
