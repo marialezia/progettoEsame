@@ -11,8 +11,8 @@ from tqdm import tqdm
 
 data = pd.read_csv('~/progettoEsame/fileCSV/pollution_us_2005_2007.csv')
 
-names = (['mexico.csv', 'kansas.csv', 'illinois.csv', 'california.csv', 'newyork.csv'])
-stateCodes = ([80, 20, 17, 6, 36])
+names = (['texas.csv', 'kansas.csv', 'illinois.csv', 'california.csv', 'newyork.csv'])
+stateCodes = ([48, 20, 17, 6, 36])
 
 for i in tqdm(range(len(names)), 'progression: '):
     fz.stateFromCsv(data, stateCodes[i], names[i])
@@ -23,10 +23,12 @@ for i in tqdm(range(len(names)), 'progression: '):
 #------------------------------------------------------------------------------------#
 
 #creo nuove tabelle per lo studio degli stati e delle stazioni
-states = ([pd.read_csv('~/progettoEsame/fileCSV/illinois.csv'), pd.read_csv('~/progettoEsame/fileCSV/mexico.csv'), pd.read_csv('~/progettoEsame/fileCSV/kansas.csv'), pd.read_csv('~/progettoEsame/fileCSV/newyork.csv'), pd.read_csv('~/progettoEsame/fileCSV/california.csv')])
-namesDate = (['illinoisDate.csv', 'mexicoDate.csv', 'kansasDate.csv', 'newyorkDate.csv', 'californiaDate.csv'])
-namesDateSite =  (['illinoisDateSite.csv', 'mexicoDateSite.csv', 'kansasDateSite.csv', 'newyorkDateSite.csv', 'californiaDateSite.csv'])
-
+states = ([pd.read_csv('~/progettoEsame/fileCSV/illinois.csv'), pd.read_csv('~/progettoEsame/fileCSV/texas.csv'), pd.read_csv('~/progettoEsame/fileCSV/kansas.csv'), pd.read_csv('~/progettoEsame/fileCSV/newyork.csv'), pd.read_csv('~/progettoEsame/fileCSV/california.csv')])
+namesDate = (['illinoisDate.csv', 'texasDate.csv', 'kansasDate.csv', 'newyorkDate.csv', 'californiaDate.csv'])
+namesDateSite =  (['illinoisDateSite.csv', 'texasDateSite.csv', 'kansasDateSite.csv', 'newyorkDateSite.csv', 'californiaDateSite.csv'])
+namesMonth = (['illinoisMonth.csv', 'texasMonth.csv', 'kansasMonth.csv', 'newyorkMonth.csv', 'californiaMonth.csv'])
 for i in tqdm(range(len(namesDate)), 'progression: '):
           fz.meanSameDay(states[i], namesDate[i])
           fz.meanSameDaySite(states[i], namesDateSite[i])
+          fz.meanSameDayMonth(states[i], namesMonth[i])
+
