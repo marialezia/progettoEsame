@@ -14,12 +14,9 @@ from scipy import constants, fft
 def analisiStazioni(stato, statoFft, siteNum, name):
     '''
     Funzione che: 
-    - genera i grafici: concentrazione inquinanti su tempo, spettro di potenza su frequenza, spettro di potenza su periodo visualizzando il punto in cui è presente il massimo dello spettro di potenza. I grafici sono sia in scala logaritmica che in scala normale.
-    - visualizza nello schermo il periodo e la frequenza in cui si ha il massimo
+    - genera i grafici: concentrazione inquinanti su tempo, spettro di potenza su frequenza, spettro di potenza su periodo, per tutte le stazioni dello stato. I grafici sono sia in scala logaritmica che in scala normale.
     - filtra i coefficienti di fourier degli inquinanti mettendo a zero quelli corrispondenti a frequenze più alte di quattro valori
-    - risintetizza i coefficienti e genera i grafici di confronto tra dati originali e risintetizzati per ognuno degli inquinanti e filtri
-    - calcola la differenza tra segnale originale e filtrato e la grafica, insieme al segnale risintetizzato
-    - calcola la correlazione tra gli inquinanti e visualizza nello schermo i valori
+    - risintetizza i coefficienti e genera i grafici dell'andamento temporale dei dati filtrati.
     '''
 
     #Grafico della concentrazione degli inquinanti in funzione del tempo e dello spettro di potenza in funzione delle frequenze, sia scala normale che scala logaritmica
@@ -39,17 +36,6 @@ def analisiStazioni(stato, statoFft, siteNum, name):
 
 
 
-    #faccio stampare le correlazioni
-    print('\n 3.CORRELAZIONE TRA I DATI \n')
-    print('Si possono calcolare quali sono i coefficienti di correlazione tra: \n - gli inquinanti diversi nella stessa stazione \n - lo stesso inquinante in stazioni diverse dello stesso stato. \n Verrà visualizzata una tabella con i coefficienti. \n')
-    risposta = input('Per visualizzare le tabelle digita 1 altrimenti digita 0 \n')
-    #if risposta == '1':
-        #fz.visualizzaCorrelazione(stato, nome)
-        #fz.visualizzaCorrelazione2(stato, nome)
-
-    no2Corr, o3Corr, so2Corr, coCorr = fz.statoCorr(stato)
-    print(no2Corr, o3Corr, so2Corr, coCorr)
-    
     print('\n 4.FILTRO IN FREQUENZA \n')
     print('Per osservare il comportamento su lungo periodo si può applicare un filtro in frequenza ai dati, mettendo a zero i coefficienti di Fourier corrispondenti a frequenze superiori ad una certa soglia. Di seguito sono state scelti quattro valori di soglia delle frequenze: \n f1 = 0.1 \n f2 = 0.05 \n f3 = 0.03 \n f4 = 0.01 \n dove l unità di misura è 1/giorno. In seguito sarà possibile inserire una frequenza di soglia a scelta. \n Verranno visualizzati i grafici dei dati risintetizzati con i diversi filtri in funzione del tempo. \n ')
     
@@ -67,20 +53,21 @@ def analisiStazioni(stato, statoFft, siteNum, name):
     statoFiltrato4 = fz.sintesiFiltrato(stato, statoFftFiltrato4, siteNum)
 
     #grafici dati risintetizzati 
-    risposta = input('Per visualizzare i grafici dei segnali risintetizzati con le diverse frequenza digita: \n a) per f1 \n b) per f2 \n c) per f3 \n d)per f4 \n altrimenti digita 0 \n')
+    risposta = input('Per visualizzare i grafici dei segnali risintetizzati con le diverse frequenza digita: \n a) per f1 \n b) per f2 \n c) per f3 \n d)per f4 \n e) inserisci tu \n altrimenti digita 0 \n')
     if risposta == 'a':
-        gr.subplotInquinanti(statoFiltrato1, 'Analisi ' + name + ': concentrazione inquinanti in funzione del tempo ', name)
+        gr.subplotInquinanti(statoFiltrato1, 'Analisi ' + name + ': concentrazione inquinanti in funzione del tempo filtati con f < 0.1 $d^{-1}$ ', name)
     elif risposta == 'b':
-        gr.subplotInquinanti(statoFiltrato2, 'Analisi ' + name + ': concentrazione inquinanti in funzione del tempo ', name)
+        gr.subplotInquinanti(statoFiltrato2, 'Analisi ' + name + ': concentrazione inquinanti in funzione del tempo  con f < 0.05 $d^{-1}$ ', name)
     elif risposta == 'c':
-        gr.subplotInquinanti(statoFiltrato3, 'Analisi ' + name + ': concentrazione inquinanti in funzione del tempo ', name)
+        gr.subplotInquinanti(statoFiltrato3, 'Analisi ' + name + ': concentrazione inquinanti in funzione del tempo  con f < 0.03 $d^{-1}$ ', name)
     elif risposta == 'd':
-        gr.subplotInquinanti(statoFiltrato4, 'Analisi ' + name + ': concentrazione inquinanti in funzione del tempo ', name)
+        gr.subplotInquinanti(statoFiltrato4, 'Analisi ' + name + ': concentrazione inquinanti in funzione del tempo  con f < 0.01 $d^{-1}$ ', name)
+    elif risposta == 'e':
+        f = float(input('inserisci frequenza [1/d]: '))
+        statoFftFiltrato = fz.maskStato2(stato, f, f, f, f)
+        statoFiltrato = fz.sintesiFiltrato(stato, statoFftFiltrato, siteNum)
+        gr.subplotInquinanti(statoFiltrato, 'Analisi ' + name + ': concentrazione inquinanti in funzione del tempo  con f < '+str(f)+' $d^{-1}$ ', name)
 
-        
-    '''subplot di quattro grafici della concentrazione in funzione del tempo, in ogni grafico è riportato il dato originale e quello filtratii quattro grafici corrispondono a un tipo di inquinante diverso'''
-
-    print('Verranno visualizzati i grafici dei dati originali e di quelli filtrati. \n')
 
 #---------------------------------------------------------------#
 #              Lettura file di dati                             #
@@ -135,7 +122,7 @@ while scelta != '0':
     elif scelta == '2':
         analisiStazioni(illinois, illinoisFft, ilSn, 'Illinois')
     elif scelta == '3':
-        analisiStazioni(newyork, newyorkFft, nySn, 'New York')
+        analisiStazioni(newyork, newyorkFft, nySn, 'NewYork')
     elif scelta == '4':
         analisiStazioni(texas, texasFft, teSn, 'Texas')
     elif scelta == '5':
@@ -144,20 +131,3 @@ while scelta != '0':
         print('esecuzione terminata')
     else:
         print('Non hai selezionato una scelta valida \n')
-
-#creo lo stato in cui sono presenti la sottocategoria siteNum che corrisponde alle stazioni di monitoraggio, ogni stazione di monitoraggio ha i suoi dati sugli inquinanti distinti. faccio grafico degli inquinanti in funzione del tempo per ogni stazione di riferimento sia in grafici distinti (sublots) che nello stesso (plot)
-'''
-florida = fzSz.createStato(flDf, sitesNum)
-#grSz.subplots(florida)
-#grSz.plot(florida)
-
-#calcolo trasformata di fourier degli inuinanti per ogni stazione di monitoraggio e faccio grafico spettro di potenza in funzione del tempo 
-
-floridaFft = fzSz.createStatoFft(florida)
-#print(floridaFft.sitesFft[0].no2F)
-#print(floridaFft.sitesFft[0].no2Fft)
-#print(floridaFft.sitesFft[0].no2P)
-
-grSz.subplotsFft(floridaFft)
-grSz.subplotStazioni(florida, 'florida')
-'''

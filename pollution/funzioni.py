@@ -297,11 +297,11 @@ def printParams(p, pcov, f):
     print('Filtro frequenza =' +str(f))
     print('NO2:    beta = ',  round(p[0][1],2) , '+-', round(np.sqrt(np.diag(pcov[0]))[1], 2))
     print('        N = ',  round(p[0][0]), '+-',  round(np.sqrt(np.diag(pcov[0]))[0]))
-    print('O3:     beta = ',  round(p[1][1],2) ,  round(np.sqrt(np.diag(pcov[1]))[1], 2))
+    print('O3:     beta = ',  round(p[1][1],2),  '+-' ,  round(np.sqrt(np.diag(pcov[1]))[1], 2))
     print('        N = ',  round(p[1][0]), '+-',  round(np.sqrt(np.diag(pcov[1]))[0]))
     print('SO2:    beta = ',  round(p[2][1],2) ,'+-',  round(np.sqrt(np.diag(pcov[2]))[1], 2))
     print('        N = ',  round(p[2][0]), '+-',  round(np.sqrt(np.diag(pcov[2]))[0]))
-    print('CO:     beta = ',  round(p[3][1],2) ,  round(np.sqrt(np.diag(pcov[3]))[1], 2))
+    print('CO:     beta = ',  round(p[3][1],2) , '+-',  round(np.sqrt(np.diag(pcov[3]))[1], 2))
     print('        N = ',  round(p[3][0]), '+-',  round(np.sqrt(np.diag(pcov[3]))[0]))
     
 
@@ -379,85 +379,3 @@ def sintesiFiltrato(stato, statoFiltratoFft, siteNum):
     sfiltrato.sintesi(statoFiltratoFft)
     return sfiltrato
 
-def corrSite(site):
-    """Restituisce una tabella con i coefficienti di correlazione tra gli inquinanti di una stazione di monitoraggio"""
-    df = pd.DataFrame()
-    df['no2'] = site.no2
-    df['o3'] = site.o3
-    df['so2'] = site.so2
-    df['co'] = site.co
-    return df.corr()
-
-def statoCorr(stato):
-    dfNo2 = pd.DataFrame()
-    dfO3 = pd.DataFrame()
-    dfSo2 = pd.DataFrame()
-    dfCo = pd.DataFrame()
-    inizio = 0
-    fine = 0
-    for i in range(len(stato.sites)-1):
-        dateComuni = (set(stato.sites[i].date)).intersection(set(stato.sites[i+1].date))
-        print(len(dateComuni))
-    dateComuni = list(dateComuni)
-    for i in tqdm(range(len(stato.sites))):
-        k = 0
-        for j in stato.sites[i].date:
-            if j == dateComuni[0]:
-                inizio = k
-                break
-            k = k+1
-
-        no2 = ([(stato.sites[i].no2)[k]])
-        o3 =([(stato.sites[i].o3)[k]])
-        so2 =([(stato.sites[i].so2)[k]])
-        co = ([(stato.sites[i].co)[k]])
-        
-        p = 1
-        date = np.array(stato.sites[i].date)
-        print('lunghezza', len(stato.sites[i].date))
-        for j in np.arange(k, len(stato.sites[i].date)):            
-            if date[j] == dateComuni[p]:
-                no2 = np.append(no2, stato.sites[i].no2[j])
-                o3 = np.append(o3, stato.sites[i].o3[j])
-                so2 = np.append(so2, stato.sites[i].so2[j])
-                co = np.append(co, stato.sites[i].co[j])
-                p = p+1
-            if p == (len(dateComuni)+1):
-                 break
-
-        print('no2', len(no2))
-    print('o3', len(o3))
-    dfNo2['site' + str(stato.siteNum[i])] = no2
-    dfO3['site' + str(stato.siteNum[i])] = o3
-    dfSo2['site' + str(stato.siteNum[i])] = so2
-    dfCo['site' + str(stato.siteNum[i])] = co
-    print(dfNo2)
-    
-    return dfNo2.corr(), dfO3.corr(), dfSo2.corr(), dfCo.corr()
-
-
-    
-    
-        
-
-def visualizzaCorrelazione(stato, name):
-    """Visualizza una tabella con le correlazioni tra gli inquinati dello stato e la salva come immagine.
-    Parametri: 
-    stato: di tipo classe Stato, stato di cui si vuole vedere la correlazione
-    name: di tipo stringa, nome dello stato """
-    corr = correlazione(stato)
-    fig , ax = plt.subplots( figsize =( 12 , 10 ) )
-    plt.title('Correlazione inquinanti stato ' + name)
-    cmap = sns.diverging_palette( 220 , 10 , as_cmap = True )
-    fig = sns.heatmap(
-        corr, 
-        cmap = cmap,
-        square=True, 
-        cbar_kws={ 'shrink' : .9 }, 
-        ax=ax, 
-        annot = True, 
-        annot_kws = { 'fontsize' : 12 }
-    )
-    currentDirectory = os.getcwd()
-    plt.savefig(currentDirectory +'/datiSalvati/analisiStati/' + name + '/correlazione' + name + '.png')
-    plt.show()

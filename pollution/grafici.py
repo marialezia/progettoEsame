@@ -465,7 +465,7 @@ def subplotInquinanti(stato, title, name):
 
     fig.legend()
     currentDirectory = os.getcwd()
-    plt.savefig(currentDirectory +'/datiSalvati/analisiStazione/' + name + '/inqSt'+name+'.png')
+    plt.savefig(currentDirectory +'/datiSalvati/analisiStazioni/' + name + '/inqSt'+name+'.png')
     plt.show()
 
 
@@ -512,10 +512,10 @@ def subplotInquinantiFft(stato, title, scale, name):
     fig.legend()
     if scale == 'log':
         currentDirectory = os.getcwd()
-    	plt.savefig(currentDirectory +'/datiSalvati/analisiStati/' + name + 'spPotFreq'+name+'Log.png')
-    elif:
+        plt.savefig(currentDirectory +'/datiSalvati/analisiStazioni/' + name + '/spPotFreq'+name+'Log.png')
+    else:
         currentDirectory = os.getcwd()
-    	plt.savefig(currentDirectory +'/datiSalvati/analisiStati/' + name + 'spPotFreq'+name+'.png')
+        plt.savefig(currentDirectory +'/datiSalvati/analisiStazioni/' + name + '/spPotFreq'+name+'.png')
     plt.show()
 
 
@@ -563,10 +563,11 @@ def subplotInquinantiFftPeriodo(stato, title, scale, name):
     
     if scale == 'log':
         currentDirectory = os.getcwd()
-    	plt.savefig(currentDirectory +'/datiSalvati/analisiStati/' + name + 'spPotPer'+name+'Log.png')
-    elif:
+        plt.savefig(currentDirectory +'/datiSalvati/analisiStazioni/' + name + '/spPotPer'+name+'Log.png')
+    else:
         currentDirectory = os.getcwd()
-    	plt.savefig(currentDirectory +'/datiSalvati/analisiStati/' + name + 'spPotPer'+name+'.png')
+        plt.savefig(currentDirectory +'/datiSalvati/analisiStazioni/' + name + '/spPotPer'+name+'.png')
+    plt.show()
     plt.show()
 
 
