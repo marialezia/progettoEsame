@@ -20,12 +20,12 @@ Nel seguente script sono definite le classi:
 
 class Stato2:
     '''
-la classe Stato2 ha 5 attributi: i giorni in cui sono registrati i dati (date) e la concentrazione di inquinanti (no2, o3, so2, co).
-Ha 3 metodi: 
-__init__: crea gli attributi come array vuoti
-aggiornaStato: aggiorna gli attributi con quelli inseriti
-sintesi: risintetizza le trasformate
-'''
+    la classe Stato2 ha 5 attributi: i giorni in cui sono registrati i dati (date) e la concentrazione di inquinanti (no2, o3, so2, co).
+    Ha 3 metodi: 
+    __init__: crea gli attributi come array vuoti
+    aggiornaStato: aggiorna gli attributi con quelli inseriti
+    sintesi: risintetizza le trasformate
+    '''
 
     def __init__(self):
         self.date = np.empty(0)
@@ -55,10 +55,10 @@ sintesi: risintetizza le trasformate
         
 class Stato2Fft:
     ''' attributi: date, fft degli inquinanti, frequenze degli inquinanti, potenza degli inquinanti
-metodi: 
-__init__: aggiorna attributi calcolandoli da quelli dello stato inseriti
-mascheraStato: filtra coefficienti mettendoli a zero a secondo le maschere inserite
-'''
+    metodi: 
+    __init__: aggiorna attributi calcolandoli da quelli dello stato inseriti
+    mascheraStato: filtra coefficienti mettendoli a zero a secondo le maschere inserite
+    '''
 
     def __init__(self, stato):
         self.date = stato.date
@@ -93,12 +93,12 @@ mascheraStato: filtra coefficienti mettendoli a zero a secondo le maschere inser
 
 class Site:
     '''
-attributi: i giorni in cui sono registrati i dati (date) e la concentrazione di inquinanti (no2, o3, so2, co), numero di stazione (sNUm), indirizzo e città (address e city).
-Ha 3 metodi: 
-__init__: crea gli attributi come array vuoti
-aggiornaStato: aggiorna gli attributi con quelli inseriti
-sintesi: risintetizza le trasformate
-'''
+    attributi: i giorni in cui sono registrati i dati (date) e la concentrazione di inquinanti (no2, o3, so2, co), numero di stazione (sNUm), indirizzo e città (address e city).
+    Ha 3 metodi: 
+    __init__: crea gli attributi come array vuoti
+    aggiornaStato: aggiorna gli attributi con quelli inseriti
+    sintesi: risintetizza le trasformate
+    '''
     def __init__(self):
         self.date = np.empty(0)
         self.sNum = np.empty(0)
@@ -130,14 +130,14 @@ sintesi: risintetizza le trasformate
         self.co =  fft.irfft(siteFft.coFft, len(self.date))
 
 class Stato:
-	'''	
-	attributi: elenco stazioni (sites) e numero stazioni (siteNUm)
-	metodi: 
-	__init__: crea elenco vuoto di stazioni, inserisce numero stazioni
-	addSite: aggiunge stazione a sites
-	copiaStato: fa una copia dello stato passato come parametro
-	sintesi: sintetizza statoFFt
-	'''
+    '''	
+    attributi: elenco stazioni (sites) e numero stazioni (siteNUm)
+    metodi: 
+    __init__: crea elenco vuoto di stazioni, inserisce numero stazioni
+    addSite: aggiunge stazione a sites
+    copiaStato: fa una copia dello stato passato come parametro
+    sintesi: sintetizza statoFFt
+    '''
 
     def __init__(self, siteNum):
         self.sites = np.empty(0)
@@ -156,11 +156,11 @@ class Stato:
 
         
 class SiteFft:
-''' attributi: date, sNum, address, city della stazione, trasformata degli inquinanti, frequenze degli inquinanti, potenza degli inquinanti
-metodi: 
-__init__: aggiorna attributi calcolandoli da quelli della stazione inseriti
-mascheraSite: filtra coefficienti mettendoli a zero a secondo le maschere inserite
-'''
+    ''' attributi: date, sNum, address, city della stazione, trasformata degli inquinanti, frequenze degli inquinanti, potenza degli inquinanti
+    metodi: 
+    __init__: aggiorna attributi calcolandoli da quelli della stazione inseriti
+    mascheraSite: filtra coefficienti mettendoli a zero a secondo le maschere inserite
+    '''
     def __init__(self, site):
         self.date = site.date
         self.sNum = site.sNum
@@ -190,14 +190,13 @@ mascheraSite: filtra coefficienti mettendoli a zero a secondo le maschere inseri
         self.coP = np.absolute(self.coFft)**2
 
 class StatoFft:
-"""
-attributi: elenco sitesFft e dei numeri corrispondenti (siteNumFFt)
-metodi: 
-__init__: crea attributi vuoti
-addSites: aggiunge elenco di sitesFft da uno stato passato come parametro
-mascheraStato: filtra coefficienti di ogni siteFft 
-
-"""
+    """
+    attributi: elenco sitesFft e dei numeri corrispondenti (siteNumFFt)
+    metodi: 
+    __init__: crea attributi vuoti
+    addSites: aggiunge elenco di sitesFft da uno stato passato come parametro
+    mascheraStato: filtra coefficienti di ogni siteFft 
+    """
     def __init__(self):
         self.sitesFft = np.empty(0)
         self.siteNumFft = np.empty(0)
