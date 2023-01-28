@@ -4,50 +4,55 @@ import classi as cl
 import sys, os
 from tqdm import tqdm
 from scipy import constants, fft
+from scipy import optimize
+import seaborn as sns
+import matplotlib.pyplot as plt
+import plotly.express as px
 
-'''
-Nel file sono vengono definite i moduli necessari per l'esecuzione dei file di analisi.
-'''
+
+"""
+Nel file sono vengono definiti i moduli necessari per l'esecuzione dei file di analisi.
+"""
 #---------------------------------------------------------------#
 #           Definizioni moduli per Gestione dati                #
 #---------------------------------------------------------------#
 
 def groupSc(df, sc):
-    '''
+    """
     Restituisce una tabella che contiene i dati corrispondenti allo stato con State Code sc. 
     Parametri: 
-    df: tabella da cui estrapola la sottotabella, contiene tutti gli stati
-    sc: State Code corrispondente allo stato di cui si vogliono selezionare i dati
-    '''
+    df: pandas DataFrame, tabella da cui estrapola la sottotabella, contiene tutti gli stati
+    sc: numero intero, State Code corrispondente allo stato di cui si vogliono selezionare i dati
+    """
     groups = df.groupby(['State Code'])
     return groups.get_group(sc)
 
 def dropColumns(df):
-    '''Elimina dalla tabella le colonne relative ai dati che non sono di interesse per l'analisi'''
+    """Elimina dalla tabella le colonne relative ai dati che non sono di interesse per l'analisi"""
     df = df.drop(columns=['NO2 1st Max Value', 'NO2 1st Max Hour', 'NO2 AQI', 'O3 1st Max Value', 'O3 1st Max Hour', 'O3 AQI', 'SO2 1st Max Value', 'SO2 1st Max Hour', 'SO2 AQI', 'CO 1st Max Value', 'CO 1st Max Hour', 'CO AQI', 'Unnamed: 29'])
     return df
 
 def stateFromCsv(df, sc, name):
-    '''
+    """
     Salva in un nuovo file csv i dati di uno stato, seleziona solo i dati di interesse.
     Parametri: 
-    df: tabella da cui estrae i dati
-    sc: State Code dello stato di cui si vogliono selezionare i dati
-    name: nome con cui viene salvato il file
-    '''
+    df: pandas DatFrame, tabella da cui estrae i dati
+    sc: numero intero, State Code dello stato di cui si vogliono selezionare i dati
+    name: stringa, nome con cui viene salvato il file
+    """
     newDf = groupSc(df, sc)
     newDf = dropColumns(newDf)
     newDf.to_csv('~/progettoEsame/fileCSV/'+name)
 
 
 def meanSameDaySite(df, name):
-    '''
+    """
     Per lo studio delle differenti stazioni all'interno di uno stato. 
     Raggruppa la tabella secondo i parametri data e stazione di monitoraggio, quando sono ripetuti fa la media dei valori degli inquinanti e riordina la tabella in base alla data. 
     Parametri: 
-    df: tabella da cui estrae i dati
-    name: nome con cui viene salvato il file
-    ''' 
+    df: pandas DataFrame, tabella da cui estrae i dati
+    name: stringa, nome con cui viene salvato il file
+    """ 
     groups = df.groupby(['Date Local', 'Site Num'], as_index=False)
     df = groups.agg(
         stateCode = pd.NamedAgg(column = 'State Code', aggfunc = 'first'),
@@ -66,13 +71,13 @@ def meanSameDaySite(df, name):
     df.to_csv('~/progettoEsame/fileCSV/' + name)
 
 def meanSameDay(df, name):
-    '''
+    """
     Per lo studio degli stati, senza differenziare le stazioni. 
     Raggruppa la tabella secondo la data, fa la media dei valori degli inqunanti in cui la data è la stessa, riordina secondo la data
     Parametri: 
-    df: tabella da cui estrae i dati
-    name: nome con cui viene salvato il file
-    ''' 
+    df: pandas DataFrame, tabella da cui estrae i dati
+    name: stringa, nome con cui viene salvato il file
+    """ 
     groups = df.groupby('Date Local', as_index=False)
     df = groups.agg(
         no2 = pd.NamedAgg(column = 'NO2 Mean', aggfunc = np.mean),
@@ -85,14 +90,15 @@ def meanSameDay(df, name):
     df.to_csv('~/progettoEsame/fileCSV/' + name)
 
 def meanSameDayMonth(df, name):
-    '''
+    """
     Per lo studio degli stati, senza differenziare le stazioni. 
     Raggruppa la tabella secondo la data, fa la media dei valori degli inqunanti in cui la data è la stessa, riordina secondo la data.
     Per ogni mese fa la media dei valori. 
     Parametri: 
-    df: tabella da cui estrae i dati
-    name: nome con cui viene salvato il file
-    ''' 
+    df: pandas DataFrame, tabella da cui estrae i dati
+    name: stringa, nome con cui viene salvato il file
+    """ 
+
     df['Date Local'] = pd.to_datetime(df['Date Local'], format = '%d/%m/%Y') 
     groups = df.groupby('Date Local', as_index=False)
     df = groups.agg(
@@ -105,41 +111,56 @@ def meanSameDayMonth(df, name):
     df = df.resample(rule='M', on='Date Local').mean()
     df.to_csv('~/progettoEsame/fileCSV/' + name)
 
+def month(stato, filtro):
+    statoFiltratoFft = maskStato(stato, filtro, filtro, filtro, filtro)
+    statoFiltrato = sintesiFiltrato2(statoFiltratoFft)
+    df = pd.DataFrame()
+    df['days'] = statoFiltrato.date
+    df['date'] = statoFiltrato.date
+    df['no2'] = statoFiltrato.no2
+    df['o3'] = statoFiltrato.o3
+    df['so2'] = statoFiltrato.so2
+    df['co'] = statoFiltrato.co
+    df['days'] = pd.to_datetime(df['days'], format = '%Y-%m-%d')
+    df['date'] = pd.to_datetime(df['date'], format = '%Y-%m-%d')
+    df = df.resample(rule='M', on='days').first()
+    #print(df)
+    return df
 #---------------------------------------------------------------#
 #           Definizioni moduli per Analisi Stati                #
 #---------------------------------------------------------------#
 
 def createStato2(df):
-    '''
+    """
     Crea una classe stato prendendo i dati dalla tabella. 
     Parametri: 
-    df: tabella da cui estrae i dati 
-    '''
+    df: pandas DataFrame, tabella da cui estrae i dati 
+    """
     stato = cl.Stato2()
     dates = pd.to_datetime(df['Date Local'], format = '%d/%m/%Y')
     stato.aggiornaStato(dates, df['no2'].values,  df['o3'].values, df['so2'].values, df['co'].values)
     return stato
     
 def createStato2b(df):
-    '''
+    """
     Crea una classe stato prendendo i dati dalla tabella, variante per la tabella con medie mensili. 
     Parametri: 
-    df: tabella da cui estrae i dati 
-    '''
+    df: pandas DataFrame, tabella da cui estrae i dati 
+    """
     stato = cl.Stato2()
-    stato.aggiornaStato(df['Date Local'], df['no2'].values,  df['o3'].values, df['so2'].values, df['co'].values)
+    stato.aggiornaStato(df['date'], df['no2'].values,  df['o3'].values, df['so2'].values, df['co'].values)
     return stato
        
 def mask(freq, soglia):
     return np.absolute(freq) > soglia
 
 def maskStato(statoFft, sogliaNo2, sogliaO3, sogliaSo2, sogliaCo):
-    '''
+    """
     Mette a zero i coefficienti di fourier degli inquinanti dello statoFft che sono superiori alle soglie passate.
     Parametri: 
-    statoFft: statoFft* da filtrare 
-    sogliaNo2, sogliaO3, sogliaSo2, sogliaCo: soglie frequenze corrispondenti ai quattro inquinanti
-    '''
+    statoFft: di tipo classe stato2Fft, stato da filtrare 
+    sogliaNo2, sogliaO3, sogliaSo2, sogliaCo: numeri reali, soglie frequenze corrispondenti ai quattro inquinanti
+    """
     statoCopia = cl.Stato2Fft(statoFft)
     mascheraNo2 = mask(statoCopia.no2F, sogliaNo2)
     mascheraO3 = mask(statoCopia.o3F, sogliaO3)
@@ -149,16 +170,16 @@ def maskStato(statoFft, sogliaNo2, sogliaO3, sogliaSo2, sogliaCo):
     return statoCopia
 
 def sintesiFiltrato2(statoFiltratoFft):
-    '''
+    """
     Risintetizza i coefficienti di Fourier dello statoFft filtrato e restituisce uno stato
     statoFiltratoFft: statoFft filtrato da risintetizzare 
-    '''
+    """
     stato = cl.Stato2()
     stato.sintesi(statoFiltratoFft)
     return stato
 
 def differenza(stato, statoFiltrato):
-    '''Restituisce uno stato differenza in cui per ogni inquinante è presente la differenza tra i dati originali e quelli filtrati'''
+    """Restituisce uno stato differenza in cui per ogni inquinante è presente la differenza tra i dati originali e quelli filtrati"""
     diff = cl.Stato2()
     diff.date = stato.date
     diff.days = stato.days
@@ -169,29 +190,32 @@ def differenza(stato, statoFiltrato):
     return diff
 
 def massimo(statoFft):
-    ''' 
+    """ 
     Restituisce i tre array: 
     - maxx: contiene gli indici del massimo valore dello spettro di potenza, per ognuno dei quattro inquinanti
     - fmax: contiente la frequenza in cui si registra il massimo, per ognuno dei quattro inquinanti
     - pmax: contiente il periodo in cui si registra il massimo, per ognuno dei quattro inquinanti
     di quattro elementi, uno per ogni inquinante, in cui sono presenti l'indice in cui 
-    '''
+    """
     maxx = ([np.argmax(statoFft.no2P[1:]), np.argmax(statoFft.o3P[1:]), np.argmax(statoFft.so2P[1:]), np.argmax(statoFft.coP[1:])])
-    fmax = ([statoFft.no2F[maxx[0]], statoFft.o3F[maxx[1]], statoFft.so2F[maxx[2]], statoFft.coF[maxx[3]]])
+    fmax = ([statoFft.no2F[1:][maxx[0]], statoFft.o3F[1:][maxx[1]], statoFft.so2F[1:][maxx[2]], statoFft.coF[1:][maxx[3]]])
     pmax = ([1/fmax[0], 1/fmax[1], 1/fmax[2], 1/fmax[3]])    
     return maxx, fmax, pmax
 
 def printMax(fmax, pmax, name):
-    '''Visualizza sullo schermo le frequenze e il periodo in cui si ha il massimo, per ogni inquinante'''
-    print('Valori corripondenti allo stato' + name + '\n')
-    print('-------------------------------------------------------------')
-    print('|           |    NO2    |    O3     |    SO2    |    CO     |')
-    print('| freq max  |  '+str(round(fmax[0], 5))+'  |  '+str(round(fmax[1], 5))+'  |  '+ str(round(fmax[2], 5))+'  |  '+str(round(fmax[3], 5))+'  |')
-    print('| per  max  |  '+str(round(pmax[0], 5))+'  |  '+str(round(pmax[1], 5))+'  |  '+ str(round(pmax[2], 5))+'  |  '+str(round(pmax[3], 5))+'  |')
-    print('-------------------------------------------------------------')
-
+    """ Visualizza sullo schermo una tabella con frequenza e periodo del massimo della potenza, salva la tabella in un file csv. """
+    df = pd.DataFrame(index = ['freqMax [1/d]', 'perMax [d]'])
+    df['NO2'] = ([round(fmax[0], 5), round(pmax[0], 1)])
+    df['O3'] = ([round(fmax[1], 5), round(pmax[1], 1)])
+    df['SO2'] = ([round(fmax[2], 5), round(pmax[2], 1)])
+    df['CO'] = ([round(fmax[3], 5), round(pmax[3], 1)])
+    print(df)
+    
+    currentDirectory = os.getcwd()
+    df.to_csv(currentDirectory + '/datiSalvati/analisiStati/' + name + '/max'+ name +'.csv')
+    
 def correlazione(stato):
-    '''Restituisce una tabella con i coefficienti di correlazione tra gli inquinanti di uno stato'''
+    """Restituisce una tabella con i coefficienti di correlazione tra gli inquinanti di uno stato"""
     df = pd.DataFrame()
     df['no2'] = stato.no2
     df['o3'] = stato.o3
@@ -199,18 +223,100 @@ def correlazione(stato):
     df['co'] = stato.co
     return df.corr()
 
+def visualizzaCorrelazione(stato, name):
+    """Visualizza una tabella con le correlazioni tra gli inquinati dello stato e la salva come immagine.
+    Parametri: 
+    stato: di tipo classe Stato2, stato di cui si vuole vedere la correlazione
+    name: di tipo stringa, nome dello stato """
+    corr = correlazione(stato)
+    fig , ax = plt.subplots( figsize =( 12 , 10 ) )
+    plt.title('Correlazione inquinanti stato ' + name)
+    cmap = sns.diverging_palette( 220 , 10 , as_cmap = True )
+    fig = sns.heatmap(
+        corr, 
+        cmap = cmap,
+        square=True, 
+        cbar_kws={ 'shrink' : .9 }, 
+        ax=ax, 
+        annot = True, 
+        annot_kws = { 'fontsize' : 12 }
+    )
+    currentDirectory = os.getcwd()
+    plt.savefig(currentDirectory +'/datiSalvati/analisiStati/' + name + '/correlazione' + name + '.png')
+    plt.show()
+
+def figMap(dataframe, maxx, inq):
+    """ 
+    Fa una mappa animata che mostra l'andamento della concentrazione mensile negli stati seguendo una scala di colori. 
+    df   : pandas DataFrame, tabella da cui prende i dati  
+    maxx : numero reale, valore massimo dell'inquinante 
+    inq  : stringa, nome dell'inquinante
+    """
+    fig = px.choropleth(dataframe,
+                        locations='states', 
+                        locationmode="USA-states", 
+                        scope="usa",
+                        color=inq,
+                        color_continuous_scale="Viridis_r",
+                        range_color = (0, 100),
+                        animation_frame = 'date'
+                        )
+    fig.update_layout(coloraxis_colorbar=dict(
+        title= inq + '% rispetto al massimo = ' + str(maxx) ,
+        ticks="outside", 
+        dtick=50))
+    fig.show()
 
 
+#---------------------------------------------------------------#
+#           Definizioni moduli per analisi rumore               #
+#---------------------------------------------------------------#
+
+def rumore(f, N, beta):
+    """
+    Fit spettro di potenza, restituisce N/f**beta
+    parametri:
+    f:frequenze
+    N: normalizzazione
+    beta: esponente frequenza
+    """
+    return N/f**beta
+
+
+def fit(stato, mask):
+    pNo2, pcovNo2 = optimize.curve_fit(rumore, stato.no2F[mask[0]],stato.no2P[mask[0]], p0=[2, 2])
+    pO3, pcovO3 = optimize.curve_fit(rumore, stato.o3F[mask[1]],stato.o3P[mask[1]], p0=[1, 1])
+    pSo2, pcovSo2 = optimize.curve_fit(rumore, stato.so2F[mask[2]],stato.so2P[mask[2]], p0=[1, 1])
+    pCo, pcovCo = optimize.curve_fit(rumore, stato.coF[mask[3]],stato.coP[mask[3]], p0=[1, 1])
+    p = ([pNo2, pO3, pSo2, pCo])
+    pcov = ([pcovNo2, pcovO3, pcovSo2, pcovCo])
+    return p, pcov
+
+
+def printParams(p, pcov, f):
+    print('Filtro frequenza =' +str(f))
+    print('NO2:    beta = ',  round(p[0][1],2) , '+-', round(np.sqrt(np.diag(pcov[0]))[1], 2))
+    print('        N = ',  round(p[0][0]), '+-',  round(np.sqrt(np.diag(pcov[0]))[0]))
+    print('O3:     beta = ',  round(p[1][1],2) ,  round(np.sqrt(np.diag(pcov[1]))[1], 2))
+    print('        N = ',  round(p[1][0]), '+-',  round(np.sqrt(np.diag(pcov[1]))[0]))
+    print('SO2:    beta = ',  round(p[2][1],2) ,'+-',  round(np.sqrt(np.diag(pcov[2]))[1], 2))
+    print('        N = ',  round(p[2][0]), '+-',  round(np.sqrt(np.diag(pcov[2]))[0]))
+    print('CO:     beta = ',  round(p[3][1],2) ,  round(np.sqrt(np.diag(pcov[3]))[1], 2))
+    print('        N = ',  round(p[3][0]), '+-',  round(np.sqrt(np.diag(pcov[3]))[0]))
+    
+
+    
 #---------------------------------------------------------------#
 #          Definizioni moduli per Analisi Stazioni              #
 #---------------------------------------------------------------#
 
 def groupSn(df, sn):
-    #mi resituisce una tabella corrispondente alla stazione di monitoraggio sn
+    """Restituisce una tabella corrispondente alla stazione di monitoraggio sn"""
     gp = df.groupby(['Site Num'])
     return gp.get_group(sn)
 
 def chiavi(df):
+    """Restituisce in un array l'elenco delle stazioni di monitoraggio"""
     gp = df.groupby(['Site Num'])
     keys = np.empty(0, dtype=int)
     for i in gp.groups.keys():
@@ -218,6 +324,7 @@ def chiavi(df):
     return keys
     
 def createSite(df, sn):
+    """A partire da una tabella crea una classe di tipo Site. """
     newDf = groupSn(df, sn)
     dates = pd.to_datetime(newDf['Date Local'], format = '%d/%m/%Y')
     s = cl.Site()
@@ -225,22 +332,26 @@ def createSite(df, sn):
     return s
 
 def createStato(df, sitesNum):
+    """Crea una classe di tipo stato inserendo le classi site"""
     stato = cl.Stato(sitesNum)
     for i in tqdm(sitesNum, 'creating State: '):
         stato.addSite(createSite(df, i))
     return stato     
 
 def createStatoFft(stato):
+    """Calcola le trasformate di Fourier degli inquinanti di uno stato, restituisce lo stato con coefficienti, potenza e frequenze"""
     statoFft = cl.StatoFft()
     statoFft.addSites(stato)
     return statoFft
 
 def sintesiSite(siteFft):
+    """ Risintetizza una stazione di monitoraggio filtrata"""
     siteFiltrata = cl.Site()
     siteFiltrata.sintesi(siteFft)
     return siteFiltrata
 
 def maskSite(site, sogliaNo2, sogliaO3, sogliaSo2, sogliaCo):
+    """ Mette a zero i coeffienti di Fourier degli inquinanti di una stazione sopra una certa soglia di frequenza"""
     maskNo2 = mask(site.no2F, sogliaNo2)
     maskO3 = mask(site.o3F, sogliaO3)
     maskSo2 = mask(site.so2F, sogliaSo2)
@@ -253,6 +364,7 @@ def maskSite(site, sogliaNo2, sogliaO3, sogliaSo2, sogliaCo):
     return site
 
 def maskStato2(stato, sogliaNo2, sogliaO3, sogliaSo2, sogliaCo):
+    """Filtra una classe stato"""
     statoCopia = cl.StatoFft()
     statoCopia.addSites(stato)
 
@@ -262,99 +374,90 @@ def maskStato2(stato, sogliaNo2, sogliaO3, sogliaSo2, sogliaCo):
 
 
 def sintesiFiltrato(stato, statoFiltratoFft, siteNum):
+    """Risintetizza stato filtrato"""
     sfiltrato = cl.Stato(siteNum)
     sfiltrato.sintesi(statoFiltratoFft)
     return sfiltrato
 
+def corrSite(site):
+    """Restituisce una tabella con i coefficienti di correlazione tra gli inquinanti di una stazione di monitoraggio"""
+    df = pd.DataFrame()
+    df['no2'] = site.no2
+    df['o3'] = site.o3
+    df['so2'] = site.so2
+    df['co'] = site.co
+    return df.corr()
 
+def statoCorr(stato):
+    dfNo2 = pd.DataFrame()
+    dfO3 = pd.DataFrame()
+    dfSo2 = pd.DataFrame()
+    dfCo = pd.DataFrame()
+    inizio = 0
+    fine = 0
+    for i in range(len(stato.sites)-1):
+        dateComuni = (set(stato.sites[i].date)).intersection(set(stato.sites[i+1].date))
+        print(len(dateComuni))
+    dateComuni = list(dateComuni)
+    for i in tqdm(range(len(stato.sites))):
+        k = 0
+        for j in stato.sites[i].date:
+            if j == dateComuni[0]:
+                inizio = k
+                break
+            k = k+1
 
+        no2 = ([(stato.sites[i].no2)[k]])
+        o3 =([(stato.sites[i].o3)[k]])
+        so2 =([(stato.sites[i].so2)[k]])
+        co = ([(stato.sites[i].co)[k]])
+        
+        p = 1
+        date = np.array(stato.sites[i].date)
+        print('lunghezza', len(stato.sites[i].date))
+        for j in np.arange(k, len(stato.sites[i].date)):            
+            if date[j] == dateComuni[p]:
+                no2 = np.append(no2, stato.sites[i].no2[j])
+                o3 = np.append(o3, stato.sites[i].o3[j])
+                so2 = np.append(so2, stato.sites[i].so2[j])
+                co = np.append(co, stato.sites[i].co[j])
+                p = p+1
+            if p == (len(dateComuni)+1):
+                 break
 
-#---------------------------------------------------------------#
-#           Vecchie definizioni                                 #
-#---------------------------------------------------------------#
-
-
-'''
+        print('no2', len(no2))
+    print('o3', len(o3))
+    dfNo2['site' + str(stato.siteNum[i])] = no2
+    dfO3['site' + str(stato.siteNum[i])] = o3
+    dfSo2['site' + str(stato.siteNum[i])] = so2
+    dfCo['site' + str(stato.siteNum[i])] = co
+    print(dfNo2)
     
-def newDfDateSite(df, name):
-    #Per studio differenti stazioni di monitoraggio: raggruppa la tabella secondo i parametri data e stazione di monitoraggio, quando sono ripetuti fa la madia dei valori e riordina la tabella in base alla data 
-    df = df.groupby(['Date Local','Site Num'], as_index = False).mean(True)
-    df['days'] = pd.to_datetime(df['Date Local'], format = '%d/%m/%Y') 
-    df.sort_values(by='days', inplace = True) 
-    df.to_csv('~/progettoEsame/fileCSV/' + name)
+    return dfNo2.corr(), dfO3.corr(), dfSo2.corr(), dfCo.corr()
 
-def newDfDate(df, name):
-    #Per studio stati, senza differenziare stazioni di monitoraggio: raggruppa la tabella secondo solo la data e fa la media dei valori in cui la data è la stessa, riordina secondo la data
-    df = df.groupby('Date Local', as_index = False).mean(True)
-    df['days'] = pd.to_datetime(df['Date Local'], format = '%d/%m/%Y') 
-    df.sort_values(by='days', inplace = True) 
-    df.to_csv('~/progettoEsame/fileCSV/' + name)
+
     
-def meanSameDays(df):
-    groups = df.groupby('Date Local', as_index=False)
-    df = groups.agg(
-        indice = pd.NamedAgg(column = 'Unnamed: 0', aggfunc = 'first'),
-        stateCode = pd.NamedAgg(column = 'State Code', aggfunc = 'first'),
-        countryCode = pd.NamedAgg(column = 'County Code', aggfunc = 'first'),
-        siteNum = pd.NamedAgg(column = 'Site Num', aggfunc = 'first'),
-        address = pd.NamedAgg(column = 'Address', aggfunc = 'first'),
-        state = pd.NamedAgg(column = 'State', aggfunc = "first"),
-        country = pd.NamedAgg(column = 'County', aggfunc = 'first'),
-        city = pd.NamedAgg(column = 'City', aggfunc = "first"),
-        no2 = pd.NamedAgg(column = 'NO2 Mean', aggfunc = np.mean),
-        no2Err = pd.NamedAgg(column = 'NO2 Mean', aggfunc = np.std),
-        o3 = pd.NamedAgg(column = 'O3 Mean', aggfunc = np.mean),
-        o3Err = pd.NamedAgg(column = 'O3 Mean', aggfunc = np.std),
-        so2 = pd.NamedAgg(column = 'SO2 Mean', aggfunc = np.mean),
-        so2Err = pd.NamedAgg(column = 'SO2 Mean', aggfunc = np.std),
-        co = pd.NamedAgg(column = 'CO Mean', aggfunc = np.mean),
-        coErr = pd.NamedAgg(column = 'CO Mean', aggfunc = np.std),
+    
+        
+
+def visualizzaCorrelazione(stato, name):
+    """Visualizza una tabella con le correlazioni tra gli inquinati dello stato e la salva come immagine.
+    Parametri: 
+    stato: di tipo classe Stato, stato di cui si vuole vedere la correlazione
+    name: di tipo stringa, nome dello stato """
+    corr = correlazione(stato)
+    fig , ax = plt.subplots( figsize =( 12 , 10 ) )
+    plt.title('Correlazione inquinanti stato ' + name)
+    cmap = sns.diverging_palette( 220 , 10 , as_cmap = True )
+    fig = sns.heatmap(
+        corr, 
+        cmap = cmap,
+        square=True, 
+        cbar_kws={ 'shrink' : .9 }, 
+        ax=ax, 
+        annot = True, 
+        annot_kws = { 'fontsize' : 12 }
     )
-    return df
-
-
-    
-def newDfMean(df, name):
-    df = meanSameDays(df)
-    df['days'] = pd.to_datetime(df['Date Local'], format = '%d/%m/%Y') 
-    df.sort_values(by='days', inplace = True) 
-    df.to_csv('~/progettoEsame/fileCSV/' + name)
-
-def newDfMean2(df, name):
-    df = meanSameDays(df)
-    df = df.sort_values(by='Starting_dates', inplace = True) 
-    df.to_csv(name)
-
-
-def correlazioneStati(s1, s2, s3, s4, s5, name1, name2, name3, name4, name5):
-    dfno2 = pd.DataFrame()
-    dfo3 = pd.DataFrame()
-    dfso2 = pd.DataFrame()
-    dfco = pd.DataFrame()
-
-    dfno2[name1] = s1.no2
-    dfno2[name2] = s2.no2
-    dfno2[name3] = s3.no2
-    dfno2[name4] = s4.no2
-    dfno2[name5] = s5.no2
-
-    dfo3[name1] = s1.o3
-    dfo3[name2] = s2.o3
-    dfo3[name3] = s3.o3
-    dfo3[name4] = s4.o3
-    dfo3[name5] = s5.o3
-    
-    dfso2[name1] = s1.so2
-    dfso2[name2] = s2.so2
-    dfso2[name3] = s3.so2
-    dfso2[name4] = s4.so2
-    dfso2[name5] = s5.so2
-
-    dfco[name1] = s1.co
-    dfco[name2] = s2.co
-    dfco[name3] = s3.co
-    dfco[name4] = s4.co
-    dfco[name5] = s5.co
-    return dfno2.corr(), dfo3.corr(), dfso2.corr(), dfco.corr()
- 
-'''
+    currentDirectory = os.getcwd()
+    plt.savefig(currentDirectory +'/datiSalvati/analisiStati/' + name + '/correlazione' + name + '.png')
+    plt.show()
