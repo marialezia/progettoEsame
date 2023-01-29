@@ -27,7 +27,7 @@ def analisiStato(stato, statoFft, nome):
     print('\n 1.ANALISI ANDAMENTO TEMPORALE \n')
     risposta = input('Per visualizzare grafici concentrazione degli inquinanti in funzione del tempo digita 1, altrimenti digita 0 \n')
     if risposta == '1':
-        gr.subplotInquinantiScale(stato,'Analisi ' + nome + ': grafico concentrazione inquinanti in funzione del tempo', nome , 'inq'+nome+'.png')
+        gr.subplotInquinantiScale(stato,'Analisi ' + nome + ': grafico concentrazione inquinanti in funzione del tempo', nome , '/inq'+nome+'.png')
 
     print('\n 2.ANALISI SPETTRO DI FOURIER \n Verranno visualizzati i seguenti grafici: \n - spettro di potenza in funzione delle frequenze, incluso ed escluso il termine corrispondente alla frequenza 0 \n - spettro di potenza in funzione dei periodi, evidenziando la posizione dei punti in cui lo spettro ha ampiezza massima. \n Verrà visualizzato sullo schermo una tabella in cui sono riportati i valori di frequenza e periodo in cui lo spettro assume ampiezza massima, per ogni inquinante. \n')   
     risposta = input('Per visualizzare i grafici e la tabella digita 1 altrimenti digita 0 \n')
@@ -139,7 +139,7 @@ def analisiStato(stato, statoFft, nome):
     while risp == '1':
         risp = input('Per visualizzare i grafici digita 1 altrimenti digita 0. \n ')
         if risp == '1':
-            risposta = input('Scegli il valore della frequenza di filtro: \n a) f = 0.1  \n b) f = 0.05 \n c) f = 0.03 \n d) f = 0.01 \n e) inserisci tu il valore \n')
+            risposta = input('Scegli il valore della frequenza di filtro: \n a) f = 0.1  \n b) f = 0.05 \n c) f = 0.03 \n d) f = 0.01 \n ')
             if risposta == 'a':
                 fz.printParams(p1, pcov1, filtri[0])
                 gr.graficoRumore(diff1Fft, p1[0], p1[1], p1[2],p1[3], mask1, 'Rumore e fit, filtro f <'+ str(filtri[0]), filtri[0], nome)
@@ -152,17 +152,7 @@ def analisiStato(stato, statoFft, nome):
             elif risposta == 'd':
                 fz.printParams(p4, pcov4, filtri[3])
                 gr.graficoRumore(diff4Fft, p4[0], p2[1], p3[2],p4[3], mask4, 'Rumore e fit, filtro f <'+ str(filtri[3]), filtri[3], nome)
-            elif risposta == 'e':
-                f = float(input('inserisci frequenza [1/d]: '))
-                sFiltratoFft = fz.maskStato(stato, f, f, f, f)
-                sFiltrato = fz.sintesiFiltrato2(sFiltratoFft)
-                diff = fz.differenza(stato, sFiltrato)
-                diffFft = cl.Stato2Fft(diff)
-                mask = ([fz.mask(diffFft.no2F, f),fz.mask(diffFft.o3F, f), fz.mask(diffFft.so2F, f), fz.mask(diffFft.coF, f)])
-                
-                p, pcov = fz.fit(diffFft, mask)
-                fz.printParams(p, pcov, f)
-                gr.graficoRumore(diffFft, p[0], p[1], p[2],p[3], mask, 'Rumore e fit, filtro f <'+ str(f), f, nome)
+            
 
 
     
@@ -257,7 +247,7 @@ def mappa(fl, il, ny, te, ca):
 currentDirectory = os.getcwd()
 
 flDf = pd.read_csv(currentDirectory+'/fileCSV/floridaDate.csv')
-ilDf = pd.read_csv(currentDirectory+'fileCSV/illinoisDate.csv')
+ilDf = pd.read_csv(currentDirectory+'/fileCSV/illinoisDate.csv')
 nyDf = pd.read_csv(currentDirectory+'/fileCSV/newyorkDate.csv')
 teDf = pd.read_csv(currentDirectory+'/fileCSV/texasDate.csv')
 caDf = pd.read_csv(currentDirectory+'/fileCSV/californiaDate.csv')

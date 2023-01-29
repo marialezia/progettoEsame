@@ -11,7 +11,7 @@ import sys, os
 #importo il file csv con tutti i dati e attraverso una funzione seleziono solo quelli di cinque paesi salvandoli in nuovi file csv, lascio solo le colonne che mi interessano
 
 currentDirectory = os.getcwd()
-data = pd.read_csv(currentDirectory+'/fileCSV/pollution_us_2005_2007.csv')
+data = pd.read_csv(currentDirectory+'/fileCSV/pollution_us_2005_2007.csv', low_memory = False)
 
 names = (['texas.csv', 'florida.csv', 'illinois.csv', 'california.csv', 'newyork.csv'])
 stateCodes = ([48, 12, 17, 6, 36])
