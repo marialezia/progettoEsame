@@ -7,5 +7,5 @@
 	- per ognuno dei cinque stati crea due diverse tabelle mediando i valori degli inquinanti, una per l'analisi stati (no distinzione stazioni monitoraggio) e una per l'analisi delle stazioni (dati stazioni vengono mantenuute separate \
 **3**- Eseguire i file analisiStati.py o analisiStazioni.py, l'ordine non è vincolante. \
 Il file analisiStati.py esegue un'analisi più dettagliata per i cinque stati metre il file analisiStazioni.py ripete alcuni passaggi dell'analisi, osservando separatamente i dati presi dalle diverse stazioni di monitoraggio degli stati. \
-La maggior parte dei grafici e delle tabelle che sono generati nell'esecuzione vengono salvati all'interno della cartella datiSalvati. \
+La maggior parte dei grafici e delle tabelle che sono generati nell'esecuzione vengono salvati all'interno della cartella datiSalvati. 
 
