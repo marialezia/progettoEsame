@@ -254,12 +254,13 @@ def mappa(fl, il, ny, te, ca):
 #---------------------------------------------------------------#
 #      Lettura file di dati: medie giornaliere                  #
 #---------------------------------------------------------------#
+currentDirectory = os.getcwd()
 
-flDf = pd.read_csv('~/progettoEsame/fileCSV/floridaDate.csv')
-ilDf = pd.read_csv('~/progettoEsame/fileCSV/illinoisDate.csv')
-nyDf = pd.read_csv('~/progettoEsame/fileCSV/newyorkDate.csv')
-teDf = pd.read_csv('~/progettoEsame/fileCSV/texasDate.csv')
-caDf = pd.read_csv('~/progettoEsame/fileCSV/californiaDate.csv')
+flDf = pd.read_csv(currentDirectory+'/fileCSV/floridaDate.csv')
+ilDf = pd.read_csv(currentDirectory+'fileCSV/illinoisDate.csv')
+nyDf = pd.read_csv(currentDirectory+'/fileCSV/newyorkDate.csv')
+teDf = pd.read_csv(currentDirectory+'/fileCSV/texasDate.csv')
+caDf = pd.read_csv(currentDirectory+'/fileCSV/californiaDate.csv')
 
 #---------------------------------------------------------------#
 #              Creazione classi stato                           #

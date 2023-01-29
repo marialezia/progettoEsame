@@ -1,6 +1,7 @@
 import pandas as pd
 import funzioni as fz
 from tqdm import tqdm
+import sys, os
 
 
 #-----------------------------------------------------------------------------------#
@@ -9,7 +10,8 @@ from tqdm import tqdm
 
 #importo il file csv con tutti i dati e attraverso una funzione seleziono solo quelli di cinque paesi salvandoli in nuovi file csv, lascio solo le colonne che mi interessano
 
-data = pd.read_csv('~/progettoEsame/fileCSV/pollution_us_2005_2007.csv')
+currentDirectory = os.getcwd()
+data = pd.read_csv(currentDirectory+'/fileCSV/pollution_us_2005_2007.csv')
 
 names = (['texas.csv', 'florida.csv', 'illinois.csv', 'california.csv', 'newyork.csv'])
 stateCodes = ([48, 12, 17, 6, 36])
@@ -23,7 +25,7 @@ for i in tqdm(range(len(names)), 'progression: '):
 #------------------------------------------------------------------------------------#
 
 #creo nuove tabelle per lo studio degli stati e delle stazioni
-states = ([pd.read_csv('~/progettoEsame/fileCSV/illinois.csv'), pd.read_csv('~/progettoEsame/fileCSV/texas.csv'), pd.read_csv('~/progettoEsame/fileCSV/florida.csv'), pd.read_csv('~/progettoEsame/fileCSV/newyork.csv'), pd.read_csv('~/progettoEsame/fileCSV/california.csv')])
+states = ([pd.read_csv(currentDirectory +'/fileCSV/illinois.csv'), pd.read_csv(currentDirectory +'/fileCSV/texas.csv'), pd.read_csv(currentDirectory +'/fileCSV/florida.csv'), pd.read_csv(currentDirectory +'/fileCSV/newyork.csv'), pd.read_csv(currentDirectory +'/fileCSV/california.csv')])
 namesDate = (['illinoisDate.csv', 'texasDate.csv', 'floridaDate.csv', 'newyorkDate.csv', 'californiaDate.csv'])
 namesDateSite =  (['illinoisDateSite.csv', 'texasDateSite.csv', 'floridaDateSite.csv', 'newyorkDateSite.csv', 'californiaDateSite.csv'])
 

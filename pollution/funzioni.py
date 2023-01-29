@@ -42,7 +42,8 @@ def stateFromCsv(df, sc, name):
     """
     newDf = groupSc(df, sc)
     newDf = dropColumns(newDf)
-    newDf.to_csv('~/progettoEsame/fileCSV/'+name)
+    currentDirectory = os.getcwd()
+    newDf.to_csv(currentDirectory+'/fileCSV/'+name)
 
 
 def meanSameDaySite(df, name):
@@ -67,8 +68,9 @@ def meanSameDaySite(df, name):
         co = pd.NamedAgg(column = 'CO Mean', aggfunc = np.mean),
     )
     df['days'] = pd.to_datetime(df['Date Local'], format = '%d/%m/%Y') 
-    df.sort_values(by='days', inplace = True) 
-    df.to_csv('~/progettoEsame/fileCSV/' + name)
+    df.sort_values(by='days', inplace = True)
+    currentDirectory = os.getcwd()
+    df.to_csv(currentDirectory+'/fileCSV/'+name)
 
 def meanSameDay(df, name):
     """
@@ -86,8 +88,10 @@ def meanSameDay(df, name):
         co = pd.NamedAgg(column = 'CO Mean', aggfunc = np.mean),
     )
     df['days'] = pd.to_datetime(df['Date Local'], format = '%d/%m/%Y') 
-    df.sort_values(by='days', inplace = True) 
-    df.to_csv('~/progettoEsame/fileCSV/' + name)
+    df.sort_values(by='days', inplace = True)
+    currentDirectory = os.getcwd()
+    df.to_csv(currentDirectory+'/fileCSV/'+name)
+    
 
 def meanSameDayMonth(df, name):
     """
@@ -109,7 +113,9 @@ def meanSameDayMonth(df, name):
     )
     df['Date Local'] = pd.to_datetime(df['Date Local'], format = '%d/%m/%Y') 
     df = df.resample(rule='M', on='Date Local').mean()
-    df.to_csv('~/progettoEsame/fileCSV/' + name)
+    currentDirectory = os.getcwd()
+    df.to_csv(currentDirectory+'/fileCSV/'+name)
+    
 
 def month(stato, filtro):
     statoFiltratoFft = maskStato(stato, filtro, filtro, filtro, filtro)
@@ -379,3 +385,74 @@ def sintesiFiltrato(stato, statoFiltratoFft, siteNum):
     sfiltrato.sintesi(statoFiltratoFft)
     return sfiltrato
 
+def corrStato(stato, nome):
+    """Restituisce i coefficienti di correlazione tra gli stessi inquinanti registrati in stazioni diverse dello stesso stato. """
+    x = set(stato.sites[0].date)
+    
+    if nome == 'California':
+        print('Seleziono solo le prime 5 stazioni. \n')
+        l = 5
+    else:
+        l = len(stato.sites)
+
+    for i in range(l-1):
+            y = set(stato.sites[i+1].date)
+            x = x.intersection(y)
+            
+
+    dateComuni = list(x)
+    tabs = []
+
+    for i in range(l):
+            df = pd.DataFrame(index = stato.sites[i].date)
+            df['no2'] = stato.sites[i].no2
+            df['o3'] = stato.sites[i].o3
+            df['so2'] = stato.sites[i].so2
+            df['co'] = stato.sites[i].co
+            df = df.loc[dateComuni]
+            tabs.append(df)
+   
+
+    dfNo2 = pd.DataFrame()
+    dfO3 = pd.DataFrame()
+    dfSo2 = pd.DataFrame()
+    dfCo = pd.DataFrame()
+
+    for i in range(len(tabs)):
+        dfNo2['siteNum'+str(stato.siteNum[i])] = tabs[i].no2.values
+        dfO3['siteNum'+str(stato.siteNum[i])] = tabs[i].o3.values
+        dfSo2['siteNum'+str(stato.siteNum[i])] = tabs[i].so2.values
+        dfCo['siteNum'+str(stato.siteNum[i])] = tabs[i].co.values
+
+    return dfNo2.corr(), dfO3.corr(), dfSo2.corr(), dfCo.corr()
+
+def visualizzaCorrStato(corr, nome, inq):
+    fig , ax = plt.subplots( figsize =( 12 , 10 ) )
+    plt.title('Correlazione' + inq+' nelle diverse stazioni di ' + nome)
+    cmap = sns.diverging_palette( 220 , 10 , as_cmap = True )
+    fig = sns.heatmap(
+        corr, 
+        cmap = cmap,
+        square=True, 
+        cbar_kws={ 'shrink' : .9 }, 
+        ax=ax, 
+        annot = True, 
+        annot_kws = { 'fontsize' : 12 }
+    )
+    currentDirectory = os.getcwd()
+    plt.savefig(currentDirectory +'/datiSalvati/analisiStazioni/' + nome + '/correlazione' + inq+ nome + '.png')
+    plt.show()
+    
+def corrStazioni(stato, name):
+    """Visualizza una tabella con le correlazioni tra gli inquinati dello stato e la salva come immagine.
+    Parametri: 
+    stato: di tipo classe Stato2, stato di cui si vuole vedere la correlazione
+    name: di tipo stringa, nome dello stato """
+    no2Corr, o3Corr, so2Corr, coCorr = corrStato(stato, name)
+
+    visualizzaCorrStato(no2Corr, name, 'NO2')
+    visualizzaCorrStato(o3Corr, name, 'O3')
+    visualizzaCorrStato(so2Corr, name, 'SO2')
+    visualizzaCorrStato(coCorr, name, 'CO')
+    
+    

@@ -34,8 +34,17 @@ def analisiStazioni(stato, statoFft, siteNum, name):
         gr.subplotInquinantiFft(statoFft, 'Analisi ' + name + ': spettro di potenza in funzione delle frequenze', 'log', name)
         gr.subplotInquinantiFftPeriodo(statoFft, 'Analisi ' + name + ': spettro di potenza in funzione dei periodo', 'log', name)
 
+	
 
-
+    print('\n 3.CORRELAZIONE \n')
+    print('Si possono calcolare i coefficienti di correlazione tra le concentrazioni dello stesso inquinante registrate nelle diverse stazioni di uno stato. \n')
+    risposta = input('Per visualizzare le correlazioni digita 1 altrimenti digita 0 \n')
+    if risposta == '1':
+        fz.corrStazioni(stato, name)
+    
+        
+    
+    
     print('\n 4.FILTRO IN FREQUENZA \n')
     print('Per osservare il comportamento su lungo periodo si può applicare un filtro in frequenza ai dati, mettendo a zero i coefficienti di Fourier corrispondenti a frequenze superiori ad una certa soglia. Di seguito sono state scelti quattro valori di soglia delle frequenze: \n f1 = 0.1 \n f2 = 0.05 \n f3 = 0.03 \n f4 = 0.01 \n dove l unità di misura è 1/giorno. In seguito sarà possibile inserire una frequenza di soglia a scelta. \n Verranno visualizzati i grafici dei dati risintetizzati con i diversi filtri in funzione del tempo. \n ')
     
@@ -73,11 +82,14 @@ def analisiStazioni(stato, statoFft, siteNum, name):
 #              Lettura file di dati                             #
 #---------------------------------------------------------------#
 
-flDf = pd.read_csv('~/progettoEsame/fileCSV/floridaDateSite.csv')
-ilDf = pd.read_csv('~/progettoEsame/fileCSV/illinoisDateSite.csv')
-nyDf = pd.read_csv('~/progettoEsame/fileCSV/newyorkDateSite.csv')
-teDf = pd.read_csv('~/progettoEsame/fileCSV/texasDateSite.csv')
-caDf = pd.read_csv('~/progettoEsame/fileCSV/californiaDateSite.csv')
+currentDirectory = os.getcwd()
+
+
+flDf = pd.read_csv(currentDirectory+'/fileCSV/floridaDateSite.csv')
+ilDf = pd.read_csv(currentDirectory+'/fileCSV/illinoisDateSite.csv')
+nyDf = pd.read_csv(currentDirectory+'/fileCSV/newyorkDateSite.csv')
+teDf = pd.read_csv(currentDirectory+'/fileCSV/texasDateSite.csv')
+caDf = pd.read_csv(currentDirectory+'/fileCSV/californiaDateSite.csv')
 
 #---------------------------------------------------------------#
 #        Estrapolazione elenco Stazioni di Monitoraggio         #
