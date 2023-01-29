@@ -1,1 +1,0 @@
-Nella cartella va copiato il file dati  e vengono salvate le tabelle necessarie per l'elaborazione dati.
