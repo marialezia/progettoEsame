@@ -46,10 +46,10 @@ def analisiStazioni(stato, statoFft, siteNum, name):
     
     
     print('\n 4.FILTRO IN FREQUENZA \n')
-    print('Per osservare il comportamento su lungo periodo si può applicare un filtro in frequenza ai dati, mettendo a zero i coefficienti di Fourier corrispondenti a frequenze superiori ad una certa soglia. Di seguito sono state scelti quattro valori di soglia delle frequenze: \n f1 = 0.1 \n f2 = 0.05 \n f3 = 0.03 \n f4 = 0.01 \n dove l unità di misura è 1/giorno. In seguito sarà possibile inserire una frequenza di soglia a scelta. \n Verranno visualizzati i grafici dei dati risintetizzati con i diversi filtri in funzione del tempo. \n ')
+    print('Per osservare il comportamento su lungo periodo si può applicare un filtro in frequenza ai dati, mettendo a zero i coefficienti di Fourier corrispondenti a frequenze superiori ad una certa soglia. Di seguito sono state scelti quattro valori di soglia delle frequenze: \n f1 = 0.05 \n f2 = 0.03 \n f3 = 0.01 \n f4 = 0.005 \n dove l unità di misura è 1/giorno. In seguito sarà possibile inserire una frequenza di soglia a scelta. \n Verranno visualizzati i grafici dei dati risintetizzati con i diversi filtri in funzione del tempo. \n ')
     
     #faccio dei filtri che eliminano i coefficienti con frequenze maggiori delle quattro che ho selezionato 
-    filtri = ([0.1,0.05,0.03,0.01])
+    filtri = ([0.05,0.03,0.01,0.005])
     statoFftFiltrato1 = fz.maskStato2(stato, filtri[0], filtri[0], filtri[0], filtri[0])
     statoFftFiltrato2 = fz.maskStato2(stato, filtri[1], filtri[1], filtri[1], filtri[1])
     statoFftFiltrato3 = fz.maskStato2(stato, filtri[2], filtri[2], filtri[2], filtri[2])
@@ -62,7 +62,7 @@ def analisiStazioni(stato, statoFft, siteNum, name):
     statoFiltrato4 = fz.sintesiFiltrato(stato, statoFftFiltrato4, siteNum)
 
     #grafici dati risintetizzati 
-    risposta = input('Per visualizzare i grafici dei segnali risintetizzati con le diverse frequenza digita: \n a) per f1 \n b) per f2 \n c) per f3 \n d)per f4 \n e) inserisci tu \n altrimenti digita 0 \n')
+    risposta = input('Per visualizzare i grafici dei segnali risintetizzati con le diverse frequenza digita: \n a) per f1 \n b) per f2 \n c) per f3 \n d) per f4 \n e) inserisci tu \n altrimenti digita 0 \n')
     if risposta == 'a':
         gr.subplotInquinanti(statoFiltrato1, 'Analisi ' + name + ': concentrazione inquinanti in funzione del tempo filtati con f < 0.1 $d^{-1}$ ', name)
     elif risposta == 'b':

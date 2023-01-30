@@ -67,7 +67,7 @@ def meanSameDaySite(df, name):
         so2 = pd.NamedAgg(column = 'SO2 Mean', aggfunc = np.mean),
         co = pd.NamedAgg(column = 'CO Mean', aggfunc = np.mean),
     )
-    df['days'] = pd.to_datetime(df['Date Local'], format = '%d/%m/%Y') 
+    df['days'] = pd.to_datetime(df['Date Local'], format = '%Y-%m-%d') 
     df.sort_values(by='days', inplace = True)
     currentDirectory = os.getcwd()
     df.to_csv(currentDirectory+'/fileCSV/'+name)
@@ -87,7 +87,7 @@ def meanSameDay(df, name):
         so2 = pd.NamedAgg(column = 'SO2 Mean', aggfunc = np.mean),
         co = pd.NamedAgg(column = 'CO Mean', aggfunc = np.mean),
     )
-    df['days'] = pd.to_datetime(df['Date Local'], format = '%d/%m/%Y') 
+    df['days'] = pd.to_datetime(df['Date Local'], format = '%Y-%m-%d') 
     df.sort_values(by='days', inplace = True)
     currentDirectory = os.getcwd()
     df.to_csv(currentDirectory+'/fileCSV/'+name)
@@ -103,7 +103,7 @@ def meanSameDayMonth(df, name):
     name: stringa, nome con cui viene salvato il file
     """ 
 
-    df['Date Local'] = pd.to_datetime(df['Date Local'], format = '%d/%m/%Y') 
+    df['Date Local'] = pd.to_datetime(df['Date Local'], format = '%Y-%m-%d') 
     groups = df.groupby('Date Local', as_index=False)
     df = groups.agg(
         no2 = pd.NamedAgg(column = 'NO2 Mean', aggfunc = np.mean),
@@ -111,7 +111,7 @@ def meanSameDayMonth(df, name):
         so2 = pd.NamedAgg(column = 'SO2 Mean', aggfunc = np.mean),
         co = pd.NamedAgg(column = 'CO Mean', aggfunc = np.mean),
     )
-    df['Date Local'] = pd.to_datetime(df['Date Local'], format = '%d/%m/%Y') 
+    df['Date Local'] = pd.to_datetime(df['Date Local'], format = '%Y-%m-%d') 
     df = df.resample(rule='M', on='Date Local').mean()
     currentDirectory = os.getcwd()
     df.to_csv(currentDirectory+'/fileCSV/'+name)
@@ -130,7 +130,6 @@ def month(stato, filtro):
     df['days'] = pd.to_datetime(df['days'], format = '%Y-%m-%d')
     df['date'] = pd.to_datetime(df['date'], format = '%Y-%m-%d')
     df = df.resample(rule='M', on='days').first()
-    #print(df)
     return df
 #---------------------------------------------------------------#
 #           Definizioni moduli per Analisi Stati                #
@@ -143,7 +142,7 @@ def createStato2(df):
     df: pandas DataFrame, tabella da cui estrae i dati 
     """
     stato = cl.Stato2()
-    dates = pd.to_datetime(df['Date Local'], format = '%d/%m/%Y')
+    dates = pd.to_datetime(df['Date Local'], format = '%Y-%m-%d')
     stato.aggiornaStato(dates, df['no2'].values,  df['o3'].values, df['so2'].values, df['co'].values)
     return stato
     
@@ -302,13 +301,13 @@ def fit(stato, mask):
 def printParams(p, pcov, f):
     print('Filtro frequenza =' +str(f))
     print('NO2:    beta = ',  round(p[0][1],2) , '+-', round(np.sqrt(np.diag(pcov[0]))[1], 2))
-    print('        N = ',  round(p[0][0]), '+-',  round(np.sqrt(np.diag(pcov[0]))[0]))
+    print('        N = ',   round(p[0][0],2), '+-',   round(np.sqrt(np.diag(pcov[0]))[0], 2))
     print('O3:     beta = ',  round(p[1][1],2),  '+-' ,  round(np.sqrt(np.diag(pcov[1]))[1], 2))
-    print('        N = ',  round(p[1][0]), '+-',  round(np.sqrt(np.diag(pcov[1]))[0]))
+    print('        N = ',   round(p[1][0],2), '+-',  round(np.sqrt(np.diag(pcov[1]))[0], 2))
     print('SO2:    beta = ',  round(p[2][1],2) ,'+-',  round(np.sqrt(np.diag(pcov[2]))[1], 2))
-    print('        N = ',  round(p[2][0]), '+-',  round(np.sqrt(np.diag(pcov[2]))[0]))
+    print('        N = ',  round(p[2][0],2), '+-',  round(np.sqrt(np.diag(pcov[2]))[0], 2))
     print('CO:     beta = ',  round(p[3][1],2) , '+-',  round(np.sqrt(np.diag(pcov[3]))[1], 2))
-    print('        N = ',  round(p[3][0]), '+-',  round(np.sqrt(np.diag(pcov[3]))[0]))
+    print('        N = ',  round(p[3][0],2), '+-',   round(np.sqrt(np.diag(pcov[3]))[0], 2))
     
 
     
@@ -332,7 +331,7 @@ def chiavi(df):
 def createSite(df, sn):
     """A partire da una tabella crea una classe di tipo Site. """
     newDf = groupSn(df, sn)
-    dates = pd.to_datetime(newDf['Date Local'], format = '%d/%m/%Y')
+    dates = pd.to_datetime(newDf['Date Local'], format = '%Y-%m-%d')
     s = cl.Site()
     s.aggiornaSite(dates, newDf['Site Num'], newDf['address'], newDf['city'], newDf['no2'].values, newDf['o3'].values, newDf['so2'].values, newDf['co'].values)
     return s

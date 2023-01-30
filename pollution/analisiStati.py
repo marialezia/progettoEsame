@@ -29,7 +29,7 @@ def analisiStato(stato, statoFft, nome):
     if risposta == '1':
         gr.subplotInquinantiScale(stato,'Analisi ' + nome + ': grafico concentrazione inquinanti in funzione del tempo', nome , '/inq'+nome+'.png')
 
-    print('\n 2.ANALISI SPETTRO DI FOURIER \n Verranno visualizzati i seguenti grafici: \n - spettro di potenza in funzione delle frequenze, incluso ed escluso il termine corrispondente alla frequenza 0 \n - spettro di potenza in funzione dei periodi, evidenziando la posizione dei punti in cui lo spettro ha ampiezza massima. \n Verrà visualizzato sullo schermo una tabella in cui sono riportati i valori di frequenza e periodo in cui lo spettro assume ampiezza massima, per ogni inquinante. \n')   
+    print('\n 2.ANALISI SPETTRO DI FOURIER \n Verranno visualizzati i seguenti grafici: \n - spettro di potenza in funzione delle frequenze, incluso ed escluso il termine corrispondente alla frequenza 0 \n - spettro di potenza in funzione dei periodi, evidenziando la posizione dei punti in cui lo spettro ha ampiezza massima. \n Verrà visualizzato sullo schermo una tabella in cui sono riportati i valori di frequenza e periodo in cui lo spettro assume ampiezza massima, per ogni inquinante. \n')
     risposta = input('Per visualizzare i grafici e la tabella digita 1 altrimenti digita 0 \n')
     if risposta == '1':
         gr.subplotFftScale(statoFft, 'Analisi ' + nome + ': grafico spettro di potenza inquinanti in funzione delle frequenze',nome, True)
@@ -38,6 +38,7 @@ def analisiStato(stato, statoFft, nome):
         maxx, fmax, pmax = fz.massimo(statoFft)
         #gr.subplotFftScalePeriodo(statoFft, 'Analisi ' + nome + ': grafico spettro di potenza inquinanti in funzione dei periodi', nome, False, maxx)
         gr.subplotFftScalePeriodo(statoFft, 'Analisi ' + nome + ': grafico spettro di potenza inquinanti in funzione dei periodi', nome, True, maxx)
+        
 
         fz.printMax(fmax, pmax, nome)
     print('Per confrontare lo spettro di potenza degli inquinanti si può normalizzare al valore massimo e al coefficiente c(0).\n')
@@ -57,10 +58,10 @@ def analisiStato(stato, statoFft, nome):
         fz.visualizzaCorrelazione(stato, nome)
 
     print('\n 4.FILTRO IN FREQUENZA \n')
-    print('Per osservare il comportamento su lungo periodo si può applicare un filtro in frequenza ai dati, mettendo a zero i coefficienti di Fourier corrispondenti a frequenze superiori ad una certa soglia. Di seguito sono state scelti quattro valori di soglia delle frequenze: \n f1 = 0.1 \n f2 = 0.05 \n f3 = 0.03 \n f4 = 0.01 \n dove l unità di misura è 1/giorno. Di seguito sarà possibile inserire una frequenza di soglia a scelta. \n Verranno visualizzati i grafici dei dati risintetizzati con i diversi filtri in funzione del tempo. \n ')
+    print('Per osservare il comportamento su lungo periodo si può applicare un filtro in frequenza ai dati, mettendo a zero i coefficienti di Fourier corrispondenti a frequenze superiori ad una certa soglia. Di seguito sono state scelti quattro valori di soglia delle frequenze: \n f1 = 0.05 \n f2 = 0.03 \n f3 = 0.01 \n f4 = 0.005 \n dove l unità di misura è 1/giorno. \n Verranno visualizzati i grafici dei dati risintetizzati con i diversi filtri in funzione del tempo. \n ')
 
     #filtri che eliminano i coefficienti con frequenze maggiori dei quattro valori 
-    filtri = ([0.1,0.05,0.03,0.01])
+    filtri = ([0.05,0.03,0.01,0.005])
     statoFftFiltrato1 = fz.maskStato(stato, filtri[0], filtri[0], filtri[0], filtri[0])
     statoFftFiltrato2 = fz.maskStato(stato, filtri[1], filtri[1], filtri[1], filtri[1])
     statoFftFiltrato3 = fz.maskStato(stato, filtri[2], filtri[2], filtri[2], filtri[2])
@@ -77,7 +78,7 @@ def analisiStato(stato, statoFft, nome):
     if risposta == '1':
         gr.subplotFiltri(statoFiltrato1, statoFiltrato2, statoFiltrato3, statoFiltrato4, nome, filtri)
 
-    risposta = input('Per visualizzare i grafici precedenti con maggior dettaglio digita: \n a) per f1 \n b) per f2 \n c) per f3 \n d)per f4 \n altrimenti digita 0 \n')
+    risposta = input('Per visualizzare i grafici precedenti con maggior dettaglio digita: \n a) per f1 \n b) per f2 \n c) per f3 \n d) per f4 \n altrimenti digita 0 \n')
     if risposta == 'a':
         gr.plotInquinanti2(statoFiltrato1, 'Analisi ' + nome + ': dati risintetizzati con filtro frequenze f < ' +str(filtri[0])+' $d^-1$', nome)
     elif risposta == 'b':
@@ -95,7 +96,7 @@ def analisiStato(stato, statoFft, nome):
     while risp == '1':
         risp = input('Per visualizzare i grafici digita 1 altrimenti digita 0. ')
         if risp == '1':
-            risposta = input('Scegli il valore della frequenza di filtro: \n a) f = 0.1  \n b) f = 0.05 \n c) f = 0.03 \n d) f = 0.01 \n e) inserisci tu il valore \n')
+            risposta = input('Scegli il valore della frequenza di filtro: \n a) f = 0.05  \n b) f = 0.03 \n c) f = 0.01 \n d) f = 0.005 \n e) inserisci tu il valore \n')
             if risposta == 'a':
                 gr.originaleVsFiltrato(stato, statoFiltrato1, 'Analisi ' + nome + ':confronto inquinanti dati originali e filtrati con frequenza f<0.1',nome, filtri[0])
             elif risposta == 'b':
@@ -139,7 +140,7 @@ def analisiStato(stato, statoFft, nome):
     while risp == '1':
         risp = input('Per visualizzare i grafici digita 1 altrimenti digita 0. \n ')
         if risp == '1':
-            risposta = input('Scegli il valore della frequenza di filtro: \n a) f = 0.1  \n b) f = 0.05 \n c) f = 0.03 \n d) f = 0.01 \n ')
+            risposta = input('Scegli il valore della frequenza di filtro: \n a) f = 0.05  \n b) f = 0.03 \n c) f = 0.01 \n d) f = 0.005 \n ')
             if risposta == 'a':
                 fz.printParams(p1, pcov1, filtri[0])
                 gr.graficoRumore(diff1Fft, p1[0], p1[1], p1[2],p1[3], mask1, 'Rumore e fit, filtro f <'+ str(filtri[0]), filtri[0], nome)
